@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/users','dashboard\apiUserController@index')->name('user.index');
+Route::post('/users','dashboard\apiUserController@store')->name('user.store');
+Route::get('/user/{id}','dashboard\apiUserController@show')->name('user.show');
