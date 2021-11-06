@@ -121,6 +121,7 @@ class AuthController extends Controller
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 3660,
                 'userUniqueId' => auth()->user()->id,
+                'isStaff' => auth()->user()->isStaff,
                 'name' => auth()->user()->name,
                 'userRole' => auth()->user()->getRoleNames()->first(),
             ],200);
@@ -130,6 +131,7 @@ class AuthController extends Controller
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
                 'userUniqueId' => auth()->user()->id,
+                'isStaff' => auth()->user()->isStaff,
                 'name' => auth()->user()->name,
                 'userRole' => auth()->user()->getRoleNames()->first(),
 

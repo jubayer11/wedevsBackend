@@ -1,5 +1,6 @@
 <?php
 
+use App\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -14,17 +15,16 @@ class usersTableSeeder extends Seeder
     public function run()
     {
         //
-        DB::table('users')->insert([
+        collect([
             [
+                'name' => 'jubayer',
                 'email' => 'admin@wedevs.com',
                 'password' => Hash::make('password'),
-                'name' => 'jubayer',
+                'isStaff' => 1,
             ],
-        ])
-//            ->each(function ($item) {
-//            User::create($item)->assignRole('admin');
-//        })
-        ;
+        ])->each(function ($item) {
+            User::create($item)->assignRole('user');
+        });
 
     }
 }

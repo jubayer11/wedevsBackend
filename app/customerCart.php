@@ -10,6 +10,6 @@ class customerCart extends Model
 
     public function usersCart()
     {
-        return $this->belongsToMany(customerCart::class,'customer_carts','userId','cartId');
+        return $this->belongsToMany(Product::class,'customer_carts','userId','productId');
     }
 }
