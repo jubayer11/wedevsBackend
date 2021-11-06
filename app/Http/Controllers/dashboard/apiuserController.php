@@ -19,7 +19,7 @@ class apiuserController extends Controller
     {
         //
         $users = User::all();
-        return $users;
+        return usersResource::collection($users);
     }
 
     /**
