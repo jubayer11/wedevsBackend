@@ -4,6 +4,8 @@ namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\productRequest;
+use App\Http\Requests\productEditRequest;
+
 use App\Http\Resources\productsResource;
 use App\Product;
 use Illuminate\Http\Request;
@@ -21,7 +23,8 @@ class apiProductsController extends Controller
     public function store(productRequest $request)
     {
 
-        $exploded = explode(',', $request->image);
+        $random = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 3);
+        $exploded = explode(',', $request->file);
         $decoded = base64_decode($exploded[1]);
         if (str_contains($exploded[0], 'jpeg')) {
             $extension = 'jpeg';
@@ -32,7 +35,8 @@ class apiProductsController extends Controller
         }
 
         $fileName = Str::random() . time() . '.' . $extension;
-        $path = public_path() . '/Uploads/products' . $fileName;
+        $path = public_path() . '/uploads/products/' . $fileName;
+
         file_put_contents($path, $decoded);
 
         $product = new Product();
@@ -42,6 +46,8 @@ class apiProductsController extends Controller
         $product->image = $fileName;
         $product->description = $request->description;
         $product->save();
+        $product->uniqueId = $product->id . $random;
+        $product->save();
     }
 
     public function show($id)
@@ -50,13 +56,12 @@ class apiProductsController extends Controller
         return new productsResource($product);
     }
 
-    public function update(productRequest $request, $id)
+    public function update(productEditRequest $request, $id)
     {
         //
         $product = Product::find($id);
-        if ($request->image!= $product->image)
-        {
-            $exploded = explode(',', $request->image);
+        if ($request->file != '') {
+            $exploded = explode(',', $request->file);
             $decoded = base64_decode($exploded[1]);
             if (str_contains($exploded[0], 'jpeg')) {
                 $extension = 'jpeg';
@@ -67,18 +72,23 @@ class apiProductsController extends Controller
             }
 
             $fileName = Str::random() . time() . '.' . $extension;
-            $path = public_path() . '/Uploads/products' . $fileName;
+            $path = public_path() . '/uploads/products/' . $fileName;
             file_put_contents($path, $decoded);
-
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->quantity = $request->quantity;
+            $product->image = $fileName;
+            $product->description = $request->description;
+            $product->save();
+        } else {
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->quantity = $request->quantity;
+            $product->description = $request->description;
+            $product->save();
         }
 
 
-        $product->name = $request->name;
-        $product->price = $request->price;
-        $product->quantity = $request->quantity;
-        $product->image = $fileName;
-        $product->description = $request->description;
-        $product->save();
     }
 
     public function destroy($id)
@@ -87,5 +97,13 @@ class apiProductsController extends Controller
         $product->delete();
     }
 
+
+    //home product
+    //
+    public function getHomeProducts()
+    {
+        $products = Product::all()->take(3);
+        return productsResource::collection($products);
+    }
 
 }

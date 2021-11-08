@@ -23,7 +23,7 @@ class usersTableSeeder extends Seeder
                 'isStaff' => 1,
             ],
         ])->each(function ($item) {
-            User::create($item)->assignRole('user');
+            User::create($item)->assignRole('admin');
         });
 
     }

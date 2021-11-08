@@ -24,7 +24,7 @@ class roleSeeder extends Seeder
             ],
             [
                 'role' => [
-                    'name' => 'User',
+                    'name' => 'user',
                 ],
 
             ],

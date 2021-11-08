@@ -41,12 +41,12 @@ class apiuserController extends Controller
     public function store(Request $request)
     {
         //
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->save();
-        return response()->json($user);
+//        $user = new User();
+//        $user->name = $request->name;
+//        $user->email = $request->email;
+//        $user->password = Hash::make($request->password);
+//        $user->save();
+//        return response()->json($user);
     }
 
     /**
@@ -58,9 +58,9 @@ class apiuserController extends Controller
     public function show($id)
     {
         //
-
-        $user = User::find($id);
-        return new usersResource($user);
+//
+//        $user = User::find($id);
+//        return new usersResource($user);
     }
 
     /**

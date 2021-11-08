@@ -13,18 +13,22 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+//dashboard routes
 
+//user
 Route::get('/users','dashboard\apiUserController@index')->name('user.index');
 Route::post('/users','dashboard\apiUserController@store')->name('user.store');
 Route::get('/user/{id}','dashboard\apiUserController@show')->name('user.show');
 
-
+//products
 Route::get('/products','dashboard\apiProductsController@index')->name('products.all');
 Route::get('/product/{id}','dashboard\apiProductsController@show')->name('product.show');
 Route::post('/products','dashboard\apiProductsController@store')->name('products.store');
-Route::put('/products/{id}','dashboard\apiProductsController@update')->name('products.update');
-Route::delete('/product/{id}','dashboard\apiProductsController@delete')->name('products.delete');
+Route::put('/product/{id}','dashboard\apiProductsController@update')->name('products.update');
+Route::delete('/product/{id}','dashboard\apiProductsController@destroy')->name('products.delete');
 
+//homeProducts
+Route::get('/homeProducts','dashboard\apiProductsController@getHomeProducts')->name('products.home');
 
 
 Route::group([
@@ -38,9 +42,4 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
     Route::post('signup', 'AuthController@signup');
-
-    Route::post('reset-password', 'AuthmailController@sendPasswordResetLink');
-    Route::post('reset/password', 'AuthController@callResetPassword');
-
-
 });

@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
         factory(App\Product::class, 50)->create();
         $this->call(cuomerOrderSeeder::class);
         $products = \App\Product::all();
+        App\User::all()->each(function ($user)  {
+            $user->assignRole('user');
+        });
         App\User::all()->each(function ($user) use ($products) {
             $user->usersCart()->attach(
                 $products->random(rand(1, 3))->pluck('id')->toArray()

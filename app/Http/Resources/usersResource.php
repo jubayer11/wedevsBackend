@@ -18,7 +18,7 @@ class usersResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'isStaff' => $this->isStaff,
-            'role' => $this->role,
+            'role' => $this->getRoleNames()->first(),
             'createdAt' => $this->created_at->diffForHumans(),
             ];
     }
