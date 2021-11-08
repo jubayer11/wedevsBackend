@@ -30,6 +30,15 @@ Route::delete('/product/{id}','dashboard\apiProductsController@destroy')->name('
 //homeProducts
 Route::get('/homeProducts','dashboard\apiProductsController@getHomeProducts')->name('products.home');
 
+//cart
+Route::post('/cart','project\apiCartController@addProductToCart')->name('cart.add');
+Route::get('/cart/count/{id}','project\apiCartController@getCartCount')->name('cart.count');
+
+
+
+//productsProduct
+Route::get('/productProducts/{key}/{sort}','dashboard\apiProductsController@getproductProducts')->name('products.product');
+
 
 Route::group([
     'middleware' => 'api',

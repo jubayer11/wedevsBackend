@@ -9,6 +9,7 @@ use App\Http\Requests\productEditRequest;
 use App\Http\Resources\productsResource;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class apiProductsController extends Controller
@@ -105,5 +106,26 @@ class apiProductsController extends Controller
         $products = Product::all()->take(3);
         return productsResource::collection($products);
     }
+    public function getProductProducts($key,$sort)
+    {
+        if ($sort==2)
+        {
+            $products =   Product::query()
+                ->where('name', 'LIKE', "%{$key}%")->orderBy('price', 'DESC')->paginate(9);
+        }
+        else if ($sort==1)
+        {
+            $products =   Product::query()
+                ->where('name', 'LIKE', "%{$key}%")->orderBy('price', 'ASC')->paginate(9);
+        }
+        else
+        {
+            $products =   Product::query()
+                ->where('name', 'LIKE', "%{$key}%")->paginate(9);
+        }
+
+        return productsResource::collection($products);
+    }
+
 
 }
