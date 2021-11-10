@@ -33,11 +33,17 @@ Route::get('/homeProducts','dashboard\apiProductsController@getHomeProducts')->n
 //cart
 Route::post('/cart','project\apiCartController@addProductToCart')->name('cart.add');
 Route::get('/cart/count/{id}','project\apiCartController@getCartCount')->name('cart.count');
-
-
+Route::get('/cart/{userId}','project\apiCartController@getCartProduct')->name('cart.get');
+Route::delete('/cart/{cartId}','project\apiCartController@deleteCartProduct')->name('cart.delete');
+Route::post('/cart/update','project\apiCartController@updateCartProduct')->name('cart.delete');
 
 //productsProduct
 Route::get('/productProducts/{key}/{sort}','dashboard\apiProductsController@getproductProducts')->name('products.product');
+
+//order
+Route::post('/order','project\apiOrderController@store')->name('cart.delete');
+
+
 
 
 Route::group([

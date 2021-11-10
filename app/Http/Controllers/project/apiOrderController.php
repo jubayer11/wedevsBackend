@@ -3,58 +3,17 @@
 namespace App\Http\Controllers\project;
 
 use App\customerCart;
+use App\customerOrder;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\cartResource;
-use App\Product;
-use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class apiCartController extends Controller
+class apiOrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
-    public function addProductToCart(Request $request)
-    {
-        $cart = new customerCart();
-        $cart->userId = $request->UserId;
-        $cart->productId = $request->productId;
-        $cart->quantity = $request->quantity;
-        $cart->save();
-    }
-
-    public function getCartCount($id)
-    {
-        $cartCount = DB::table('customer_carts')->where('userId', $id)->count();
-        return $cartCount;
-    }
-
-    public function getCartProduct($userId)
-    {
-        $user = User::find($userId);
-        return cartResource::collection($user->usersCart);
-    }
-
-    public function deleteCartProduct($cartId)
-    {
-        $customerCart = customerCart::find($cartId);
-        $customerCart->delete();
-    }
-
-    public function updateCartProduct(Request $request)
-    {
-
-        foreach ($request->cartProduct as $product) {
-            $cart = customerCart::find($product['id']);
-            $cart->quantity = $product['customerQuantity'];
-            $cart->save();
-        }
-    }
-
     public function index()
     {
         //
@@ -79,6 +38,15 @@ class apiCartController extends Controller
     public function store(Request $request)
     {
         //
+        foreach ($request->orderProduct as $order) {
+            $orderProduct = new customerOrder();
+            $orderProduct->userId = $request->userId;
+            $orderProduct->productId = $order['productId'];
+            $orderProduct->price = $order['price'];
+            $orderProduct->save();
+            $cart = customerCart::find($order['id']);
+            $cart->delete();
+        }
     }
 
     /**
