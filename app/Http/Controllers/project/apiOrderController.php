@@ -5,7 +5,14 @@ namespace App\Http\Controllers\project;
 use App\customerCart;
 use App\customerOrder;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\orderHistoryResource;
+use App\Http\Resources\orderProductResource;
+use App\Http\Resources\userOrderResource;
+use App\Order;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Models\Activity;
 
 class apiOrderController extends Controller
 {
@@ -14,9 +21,21 @@ class apiOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function getUserOrder($id)
     {
         //
+        $user = User::find($id);
+        return userOrderResource::collection($user->UserOrders);
+
+
+    }
+
+    public function getAllOrder()
+    {
+        //
+        $order = Order::all();
+        return userOrderResource::collection($order);
+
     }
 
     /**
@@ -24,9 +43,12 @@ class apiOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function editOrder(Request $request, $id)
     {
         //
+        $order = Order::find($id);
+        $order->status = $request->status;
+        $order->save();
     }
 
     /**
@@ -38,13 +60,19 @@ class apiOrderController extends Controller
     public function store(Request $request)
     {
         //
-        foreach ($request->orderProduct as $order) {
+
+        $order = new Order();
+        $order->userId = $request->userId;
+        $order->billingAddress = $request->address;
+        $order->save();
+        foreach ($request->orderProduct as $orders) {
             $orderProduct = new customerOrder();
-            $orderProduct->userId = $request->userId;
-            $orderProduct->productId = $order['productId'];
-            $orderProduct->price = $order['price'];
+            $orderProduct->orderId = $order->id;
+            $orderProduct->productId = $orders['productId'];
+            $orderProduct->quantity = $orders['customerQuantity'];
+            $orderProduct->price = $orders['price'];
             $orderProduct->save();
-            $cart = customerCart::find($order['id']);
+            $cart = customerCart::find($orders['id']);
             $cart->delete();
         }
     }
@@ -55,9 +83,12 @@ class apiOrderController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function showProduct($id)
     {
         //
+        $order = Order::find($id);
+        return orderProductResource::collection($order->orderProduct);
+
     }
 
     /**
@@ -78,9 +109,16 @@ class apiOrderController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updateOrder(Request $request)
     {
         //
+        foreach ($request->updateProduct as $orders) {
+            $orderProduct = customerOrder::find($orders['id']);
+            $orderProduct->productId = $orders['productId'];
+            $orderProduct->quantity = $orders['customerQuantity'];
+            $orderProduct->price = $orders['price'];
+            $orderProduct->save();
+        }
     }
 
     /**
@@ -89,8 +127,24 @@ class apiOrderController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function orderDeleteProduct($id)
     {
         //
+        $orderProduct = customerOrder::find($id);
+        $orderProduct->delete();
+
+    }
+
+    public function UserOrderHistory($orderId)
+    {
+
+        $products = DB::table('activity_log')
+            ->where("properties->attributes->orderId", '=', $orderId)->orderBy('id', 'DESC')->get();
+        foreach ($products as $product) {
+            $product->properties = json_decode($product->properties);
+        }
+
+        return orderHistoryResource::collection($products);
+
     }
 }
