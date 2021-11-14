@@ -54,8 +54,12 @@ Route::get('order/all', 'project\apiOrderController@getAllOrder')->name('order.a
 Route::put('order/edit/{id}', 'project\apiOrderController@editOrder')->name('order.edit');
 
 
+//notification
+Route::get('/user/{id}/notification', 'dashboard\apiNotificationController@index');
+Route::get('/user/{id}/notification/markRead', 'dashboard\apiNotificationController@markAsRead');
 
-
+//dashboard
+Route::get('/wedevs','dashboard\apiNotificationController@getDashboardData');
 
 
 //activity log

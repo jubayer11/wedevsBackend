@@ -8,11 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\orderHistoryResource;
 use App\Http\Resources\orderProductResource;
 use App\Http\Resources\userOrderResource;
+use App\Notifications\orderNotification;
 use App\Order;
+use App\Product;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\Activitylog\Models\Activity;
 
 class apiOrderController extends Controller
 {
@@ -47,8 +49,17 @@ class apiOrderController extends Controller
     {
         //
         $order = Order::find($id);
+        if ($order->status != 4 && $request->status == 4) {
+            foreach ($order->orderProduct as $product) {
+                $item = Product::find($product->id);
+                $item->quantity -= $product->pivot->quantity;
+                $item->save();
+
+            }
+        }
         $order->status = $request->status;
         $order->save();
+
     }
 
     /**
@@ -75,6 +86,10 @@ class apiOrderController extends Controller
             $cart = customerCart::find($orders['id']);
             $cart->delete();
         }
+        $user = User::find(1);
+        $customer = User::find($request->userId);
+        $user->notify(new orderNotification($customer));
+
     }
 
     /**
@@ -147,4 +162,6 @@ class apiOrderController extends Controller
         return orderHistoryResource::collection($products);
 
     }
+
+
 }
