@@ -17,6 +17,14 @@ class apiCartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware(['JWT','role:user|admin']);
+        if (env('APP_ENV') == 'testing'
+            && array_key_exists("HTTP_AUTHORIZATION", request()->server())) {
+            JWTAuth::setRequest(\Route::getCurrentRequest());
+        }
+    }
 
     public function addProductToCart(Request $request)
     {

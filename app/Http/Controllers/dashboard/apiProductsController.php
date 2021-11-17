@@ -19,6 +19,7 @@ class apiProductsController extends Controller
     {
         $products = Product::all();
         return productsResource::collection($products);
+
     }
 
     public function store(productRequest $request)

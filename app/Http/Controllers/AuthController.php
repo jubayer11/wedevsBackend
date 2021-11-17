@@ -16,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class AuthController extends Controller
 {
-    use HasRoles,ResetsPasswords;
+    use HasRoles, ResetsPasswords;
 
 
     /**
@@ -25,10 +25,9 @@ class AuthController extends Controller
      * @return void
      */
 
-
     public function __construct()
     {
-        $this->middleware('JWT', ['except' => ['login', 'signup', 'sendResetFailedResponse', 'sendResetResponse', 'callResetPassword', 'resetPassword']]);
+        $this->middleware('JWT', ['except' => ['login', 'signup']]);
         if (env('APP_ENV') == 'testing'
             && array_key_exists("HTTP_AUTHORIZATION", request()->server())) {
             JWTAuth::setRequest(\Route::getCurrentRequest());
@@ -79,15 +78,18 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-
         return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function signup(signupRequest $request)
     {
-        $user = User::create($request->all());
-        return $this->login($request);
 
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->save();
+        $user->assignRole('user');
     }
 
     /**
@@ -107,7 +109,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token, $rememberMe,$request)
+    protected function respondWithToken($token, $rememberMe, $request)
     {
 
         auth()->user()->update([
@@ -124,7 +126,7 @@ class AuthController extends Controller
                 'isStaff' => auth()->user()->isStaff,
                 'name' => auth()->user()->name,
                 'userRole' => auth()->user()->getRoleNames()->first(),
-            ],200);
+            ], 200);
         } else {
             return response()->json([
                 'access_token' => $token,
@@ -135,32 +137,10 @@ class AuthController extends Controller
                 'name' => auth()->user()->name,
                 'userRole' => auth()->user()->getRoleNames()->first(),
 
-            ],200);
+            ], 200);
         }
 
     }
 
-    public function callResetPassword(Request $request)
-    {
-        return $this->reset($request);
-    }
-
-    protected function sendResetFailedResponse(Request $request, $response)
-    {
-        return response()->json(['message' => 'Failed, Invalid Token.']);
-    }
-
-    protected function sendResetResponse(Request $request, $response)
-    {
-        return response()->json(['message' => 'Password reset successfully.']);
-    }
-
-    protected function resetPassword($user, $password)
-    {
-
-        $user->password = Hash::make($password) ;
-        $user->save();
-        event(new PasswordReset($user));
-    }
 
 }

@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 use JWTAuth;
@@ -60,5 +61,27 @@ class usersApiTest extends TestCase
 //        ];
 //        $this->post(route('user.login'), $formData)->assertStatus(200);
 //    }
+
+
+    public function testShowProductAll()
+    {
+        $this->get(route('products.all'))->assertStatus(200);
+    }
+
+    public function testCreateproduct()
+    {
+        $this->withoutMiddleware();
+        $formData = [
+            'name' => 'some name',
+            'price' => '200',
+            'quantity' => '20',
+            'file'=> UploadedFile::fake()->image('avatar.jpg'),
+            'description'=>'hello mello'
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->post(route('products.store'), $formData)->assertStatus(200);
+    }
+
 
 }
